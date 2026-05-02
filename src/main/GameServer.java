@@ -1,0 +1,97 @@
+package main;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+import entity.Player;
+
+public class GameServer {
+
+    private static final int PORT = 12345;
+    private static Set<ClientHandler> clients = new HashSet<>();
+    public static ArrayList<Player> players = new ArrayList<>();
+    public static int mainPlayerCount = 0;
+    static int playerCounter = 0;
+
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(PORT);
+        System.out.println("Server started on port " + PORT);
+        
+        
+        int[] positions = {0, 50, 25, 30};
+        int counter = 0;
+        while (true) {
+            Socket socket = serverSocket.accept();
+            System.out.println("New player connected");
+            
+//            KeyHandler keyH = new KeyHandler();
+//            GamePanel gamePanel = new GamePanel(players, keyH);
+//            Player player = new Player(gamePanel, keyH, positions[counter], positions[counter]);
+//            gamePanel.myPlayer = player;
+//            
+//          
+//            Main main = new Main(gamePanel);
+//            players.add(player);
+   
+            ClientHandler client = new ClientHandler(socket);
+            client.clientID = playerCounter;
+            clients.add(client);
+            client.start();
+            GameServer.broadcast("NEW_PLAYER", client);
+            sendTo(client, "NEW_PLAYER", playerCounter++);
+            counter++;
+        }
+    }
+
+    public static void broadcast(String message, ClientHandler sender) {
+        for (ClientHandler client : clients) {
+            if (client != sender) {
+                client.sendMessage(message);
+            }
+
+        }
+    }
+    
+    public static void sendTo(ClientHandler client, String message, int times) {
+        for (int i = 0; i < times; i++) {
+            client.sendMessage(message);
+        }
+    }
+
+    public static void removeClient(ClientHandler client) {
+        clients.remove(client);
+    }
+
+    static class ClientHandler extends Thread {
+        private Socket socket;
+        private BufferedReader in;
+        private PrintWriter out;
+        private int clientID;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void sendMessage(String msg) {
+            out.println(msg);
+        }
+
+        public void run() {
+            try {
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
+
+                String message;
+                while ((message = in.readLine()) != null) {
+                    System.out.println("Received: " + message);
+                    GameServer.broadcast(message, this);
+                }
+            } catch (IOException e) {
+                System.out.println("Player disconnected");
+            } finally {
+                GameServer.removeClient(this);
+                try { socket.close(); } catch (IOException ignored) {}
+            }
+        }
+    }
+}

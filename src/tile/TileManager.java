@@ -37,7 +37,6 @@ public class TileManager {
 			for (int i = 1; i <= 89; i++) {
 			    tile[i] = new Tile();
 			    String fileName = String.format("/tiles/%03d.png", i);
-			    System.out.println(fileName);
 			    tile[i].image = ImageIO.read(getClass().getResourceAsStream(fileName));
 			    if ((i >= 17 && i <= 27) || (i == 32 || i == 39 || i == 55 || i == 64) || (i >= 64 && i <= 74) || (i == 27 || i == 36 || i == 44 || i == 59))
 			    {
@@ -84,10 +83,8 @@ public class TileManager {
 				String line = br.readLine();
 				String numbers[] = line.split(" ");
 				for (int j = 0; j < gp.maxScreenCol; j++) {
-					System.out.print(numbers[j] + " ");
 					mapTileNum[i][j] = Integer.parseInt(numbers[j]);
 				}
-				System.out.println(" yow");
 			}
 			
 		} catch (Exception e) {

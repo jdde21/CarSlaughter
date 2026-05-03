@@ -16,16 +16,14 @@ public class GameClient {
     public static void main(String[] args) throws IOException {
 
         Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-        int id = GameServer.mainPlayerCount++;
         System.out.println("Connected to server!");
         
         KeyHandler keyH = new KeyHandler();
         GamePanel gamePanel = new GamePanel(players, keyH);
         Player player = new Player(gamePanel, keyH, positions[0], positions[0]);
-        player.playerID = id;
         gamePanel.myPlayer = player;        
       
-        Main main = new Main(gamePanel);
+        Main main = new Main(gamePanel, "Player " + player.playerID);
         
 
         BufferedReader in = new BufferedReader(
@@ -44,92 +42,104 @@ public class GameClient {
                 	System.out.println(parts);
                 	if (parts.length > 1)
                 	{
-                		System.out.println(parts);
-                    	System.out.println("msg");
-                    	String direction = parts[0];
-                    	int sentID = Integer.parseInt(parts[1]);
-                    
-                    	if (direction.equals("up"))
-                    	{
-                    		
-                    		if (id < sentID)
-                    		{
-                    			sentID--;
-                    		}
-                    		
-                			players.get(sentID).up = true;
-                			players.get(sentID).down = false;
-                			players.get(sentID).right = false;
-                			players.get(sentID).left = false;
-                			players.get(sentID).space = false;
-                			players.get(sentID).updateFromOther();
-                    		
-                    		System.out.println("Other player bitch: " + msg);
-                    	}
-                    	if (direction.equals("down"))
-                    	{
-                    		
-                    		if (id < sentID)
-                    		{
-                    			sentID--;
-                    		}
-                    		
-                    		players.get(sentID).up = false;
-                			players.get(sentID).down = true;
-                			players.get(sentID).right = false;
-                			players.get(sentID).left = false;
-                			players.get(sentID).space = false;
-                			players.get(sentID).updateFromOther();
-                    		
-                    		System.out.println("Other player bitch: " + msg);
-                    	}
-                    	if (direction.equals("right"))
-                    	{
-                    		
-                    		if (id < sentID)
-                    		{
-                    			sentID--;
-                    		}
-                    		
-                    		players.get(sentID).up = false;
-                			players.get(sentID).down = false;
-                			players.get(sentID).right = true;
-                			players.get(sentID).left = false;
-                			players.get(sentID).space = false;
-                			players.get(sentID).updateFromOther();
-                    		
-                    		System.out.println("Other player bitch: " + msg);
-                    	}
-                    	if (direction.equals("left"))
-                    	{
-                    		
-                    		if (id < sentID)
-                    		{
-                    			sentID--;
-                    		}
-                    		
-                    		players.get(sentID).up = false;
-                			players.get(sentID).down = false;
-                			players.get(sentID).right = false;
-                			players.get(sentID).left = true;
-                			players.get(sentID).space = false;
-                			players.get(sentID).updateFromOther();
-                    		
-                    		System.out.println("Other player bitch: " + msg);
-                    	}
-                    	if (direction.equals("space"))
-                    	{
-                    		if (id < sentID)
-                    		{
-                    			sentID--;
-                    		}
-                    		players.get(sentID).up = false;
-                			players.get(sentID).down = false;
-                			players.get(sentID).right = false;
-                			players.get(sentID).left = false;
-                    		players.get(sentID).space = true;
-                    		players.get(sentID).updateFromOther();
-                    	}
+                		
+                		if (parts[0].equals("id"))
+                		{
+                			gamePanel.myPlayer.playerID = Integer.parseInt(parts[1]);
+                			System.out.println("boompanes " + gamePanel.myPlayer.playerID);
+                		}
+                		
+                		else	
+                		{
+                			int id = gamePanel.myPlayer.playerID;
+                			System.out.println(parts);
+                        	System.out.println("msg");
+                        	String direction = parts[0];
+                        	int sentID = Integer.parseInt(parts[1]);
+                        
+                        	if (direction.equals("up"))
+                        	{
+                        		
+                        		if (id < sentID)
+                        		{
+                        			sentID--;
+                        		}
+                        		
+                    			players.get(sentID).up = true;
+                    			players.get(sentID).down = false;
+                    			players.get(sentID).right = false;
+                    			players.get(sentID).left = false;
+                    			//players.get(sentID).space = false;
+                    			players.get(sentID).updateFromOther();
+                        		
+                        		System.out.println("Other player bitch: " + msg);
+                        	}
+                        	if (direction.equals("down"))
+                        	{
+                        		
+                        		if (id < sentID)
+                        		{
+                        			sentID--;
+                        		}
+                        		
+                        		players.get(sentID).up = false;
+                    			players.get(sentID).down = true;
+                    			players.get(sentID).right = false;
+                    			players.get(sentID).left = false;
+                    			players.get(sentID).space = false;
+                    			players.get(sentID).updateFromOther();
+                        		
+                        		System.out.println("Other player bitch: " + msg);
+                        	}
+                        	if (direction.equals("right"))
+                        	{
+                        		
+                        		if (id < sentID)
+                        		{
+                        			sentID--;
+                        		}
+                        		
+                        		players.get(sentID).up = false;
+                    			players.get(sentID).down = false;
+                    			players.get(sentID).right = true;
+                    			players.get(sentID).left = false;
+                    			players.get(sentID).space = false;
+                    			players.get(sentID).updateFromOther();
+                        		
+                        		System.out.println("Other player bitch: " + msg);
+                        	}
+                        	if (direction.equals("left"))
+                        	{
+                        		
+                        		if (id < sentID)
+                        		{
+                        			sentID--;
+                        		}
+                        		
+                        		players.get(sentID).up = false;
+                    			players.get(sentID).down = false;
+                    			players.get(sentID).right = false;
+                    			players.get(sentID).left = true;
+                    			players.get(sentID).space = false;
+                    			players.get(sentID).updateFromOther();
+                        		
+                        		System.out.println("Other player bitch: " + msg);
+                        	}
+                        	if (direction.equals("space"))
+                        	{
+                        		if (id < sentID)
+                        		{
+                        			sentID--;
+                        		}
+                        		players.get(sentID).up = false;
+                    			players.get(sentID).down = false;
+                    			players.get(sentID).right = false;
+                    			players.get(sentID).left = false;
+                        		players.get(sentID).space = true;
+                        		players.get(sentID).updateFromOther();
+                        	}
+                		}
+                		
                     	
                 	}
                 	

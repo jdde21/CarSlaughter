@@ -47,7 +47,7 @@ public class Player extends Entity {
 		// sinubtract by gp.tileSize/2 dahil if wala yan, hindi centered yung mismong character pero yung top left nung hitbox nung character
 		
 		solidArea = new Rectangle();
-		solidArea.x = 4;
+		solidArea.x = 16;
 		solidArea.y = 8;
 		solidArea.width = gp.tileSize/2;
 		solidArea.height = gp.tileSize/2;
@@ -339,6 +339,7 @@ public class Player extends Entity {
 		{
 			hitCounter = 0;
 			hit = false;
+			// if car, 50 by 34 gamitin
 			g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
 		}
 		

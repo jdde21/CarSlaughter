@@ -10,9 +10,11 @@ public class Main {
 	
 
 	public GamePanel gp;
+	public String title;
 	
-	public Main(GamePanel gp) {
+	public Main(GamePanel gp, String title) {
 		this.gp = gp;
+		this.title = title;
 		this.start();
 	}
 	
@@ -22,7 +24,7 @@ public class Main {
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
-		window.setTitle("2d adventure");
+		window.setTitle(title);
 		
 		window.add(gp);
 		window.pack();

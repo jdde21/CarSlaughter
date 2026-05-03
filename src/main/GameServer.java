@@ -39,6 +39,7 @@ public class GameServer {
             client.start();
             GameServer.broadcast("NEW_PLAYER", client);
             sendTo(client, "NEW_PLAYER", playerCounter++);
+            sendID(client);
             counter++;
         }
     }
@@ -48,7 +49,6 @@ public class GameServer {
             if (client != sender) {
                 client.sendMessage(message);
             }
-
         }
     }
     
@@ -56,6 +56,12 @@ public class GameServer {
         for (int i = 0; i < times; i++) {
             client.sendMessage(message);
         }
+    }
+    
+    public static void sendID(ClientHandler client) {
+
+    	client.sendMessage("id " + String.valueOf(GameServer.mainPlayerCount++));
+
     }
 
     public static void removeClient(ClientHandler client) {
@@ -70,6 +76,12 @@ public class GameServer {
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
+            try {
+				out = new PrintWriter(socket.getOutputStream(), true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
 
         public void sendMessage(String msg) {
@@ -79,8 +91,7 @@ public class GameServer {
         public void run() {
             try {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
-
+                
                 String message;
                 while ((message = in.readLine()) != null) {
                     System.out.println("Received: " + message);

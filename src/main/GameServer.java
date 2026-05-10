@@ -8,9 +8,9 @@ import entity.Player;
 public class GameServer {
 
     private static final int PORT = 12345;
-    private static Set<ClientHandler> clients = new HashSet<>();
+    private static final String CHAT_PREFIX = "CHAT ";
+    private static Set<ClientHandler> clients = Collections.synchronizedSet(new HashSet<>());
     public static ArrayList<Player> players = new ArrayList<>();
-    public static int mainPlayerCount = 0;
     static int playerCounter = 0;
 
     public static void main(String[] args) throws IOException {
@@ -45,9 +45,11 @@ public class GameServer {
     }
 
     public static void broadcast(String message, ClientHandler sender) {
-        for (ClientHandler client : clients) {
-            if (client != sender) {
-                client.sendMessage(message);
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                if (client != sender) {
+                    client.sendMessage(message);
+                }
             }
         }
     }
@@ -60,7 +62,7 @@ public class GameServer {
     
     public static void sendID(ClientHandler client) {
 
-    	client.sendMessage("id " + String.valueOf(GameServer.mainPlayerCount++));
+    	client.sendMessage("id " + String.valueOf(client.clientID));
 
     }
 
@@ -95,7 +97,14 @@ public class GameServer {
                 String message;
                 while ((message = in.readLine()) != null) {
                     System.out.println("Received: " + message);
-                    GameServer.broadcast(message, this);
+                    if (message.startsWith(CHAT_PREFIX)) {
+                        String chatMessage = message.substring(CHAT_PREFIX.length()).trim().replaceAll("\\s+", " ");
+                        if (!chatMessage.isEmpty()) {
+                            GameServer.broadcast(CHAT_PREFIX + clientID + " " + chatMessage, this);
+                        }
+                    } else {
+                        GameServer.broadcast(message, this);
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("Player disconnected");

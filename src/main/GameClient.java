@@ -12,7 +12,9 @@ public class GameClient {
     private static final int SERVER_PORT = 12345;
     public static ArrayList<Player> players = new ArrayList<>();
     static int[] positions = {0, 50, 25, 30};
-
+    
+	public static int[][] matrix;
+	
     public static void main(String[] args) throws IOException {
 
         Socket socket = new Socket(SERVER_IP, SERVER_PORT);
@@ -22,8 +24,8 @@ public class GameClient {
         GamePanel gamePanel = new GamePanel(players, keyH);
         Player player = new Player(gamePanel, keyH, positions[0], positions[0]);
         gamePanel.myPlayer = player;        
-      
-        Main main = new Main(gamePanel, "Player " + player.playerID);
+       
+        
         
 
         BufferedReader in = new BufferedReader(
@@ -40,20 +42,32 @@ public class GameClient {
                 while ((msg = in.readLine()) != null) {
                 	String[] parts = msg.split(" ");
                 	System.out.println(parts);
+                	System.out.println("checkthis: " + msg);
                 	if (parts.length > 1)
                 	{
                 		
                 		if (parts[0].equals("id"))
                 		{
+                			 matrix = new int[][] { 
+                	    		    {120, 120},
+                	    		    {gamePanel.screenWidth - 160, 120},
+                	    		    {120, gamePanel.screenHeight - 160},
+                	    		    {gamePanel.screenWidth - 160, gamePanel.screenHeight - 160}
+                	    		};
+                	    		
                 			gamePanel.myPlayer.playerID = Integer.parseInt(parts[1]);
-                			System.out.println("boompanes " + gamePanel.myPlayer.playerID);
+                			if (gamePanel.myPlayer.playerID % 2 != 0)
+                			{
+                				player.direction = "left";
+                			}
+                			player.worldX = matrix[gamePanel.myPlayer.playerID][0];
+                			player.worldY = matrix[gamePanel.myPlayer.playerID][1];
+                			new Main(gamePanel, "Player " + player.playerID);
                 		}
                 		
                 		else	
                 		{
                 			int id = gamePanel.myPlayer.playerID;
-                			System.out.println(parts);
-                        	System.out.println("msg");
                         	String direction = parts[0];
                         	int sentID = Integer.parseInt(parts[1]);
                         
@@ -71,8 +85,7 @@ public class GameClient {
                     			players.get(sentID).left = false;
                     			//players.get(sentID).space = false;
                     			players.get(sentID).updateFromOther();
-                        		
-                        		System.out.println("Other player bitch: " + msg);
+                        	
                         	}
                         	if (direction.equals("down"))
                         	{
@@ -89,7 +102,6 @@ public class GameClient {
                     			players.get(sentID).space = false;
                     			players.get(sentID).updateFromOther();
                         		
-                        		System.out.println("Other player bitch: " + msg);
                         	}
                         	if (direction.equals("right"))
                         	{
@@ -106,7 +118,6 @@ public class GameClient {
                     			players.get(sentID).space = false;
                     			players.get(sentID).updateFromOther();
                         		
-                        		System.out.println("Other player bitch: " + msg);
                         	}
                         	if (direction.equals("left"))
                         	{
@@ -123,7 +134,6 @@ public class GameClient {
                     			players.get(sentID).space = false;
                     			players.get(sentID).updateFromOther();
                         		
-                        		System.out.println("Other player bitch: " + msg);
                         	}
                         	if (direction.equals("space"))
                         	{
@@ -146,13 +156,28 @@ public class GameClient {
                 	else
                 	{
                 		System.out.println("Other player: " + msg);
-                        
+                		String[] words = msg.split(",");
+                		int counter = Integer.parseInt(words[1]);
+                		
+                		int[][] temp = new int[][] { 
+        	    		    {120, 120},
+        	    		    {gamePanel.screenWidth - 160, 120},
+        	    		    {120, gamePanel.screenHeight - 160},
+        	    		    {gamePanel.screenWidth - 160, gamePanel.screenHeight - 160}
+        	    		};
+        	    		
                         // Hardcoded spawn positions
-                        int x = positions[0];
-                        int y = positions[0];
-
+                        int x = temp[counter][0];
+                        int y = temp[counter][1];
+               
+                        
+                        
                         // IMPORTANT: no KeyHandler for other players
                         Player newPlayer = new Player(gamePanel, null, x, y);
+                    	if (counter % 2 != 0)
+            			{
+            				newPlayer.direction = "left";
+            			}
                         players.add(newPlayer);
                 	}
         

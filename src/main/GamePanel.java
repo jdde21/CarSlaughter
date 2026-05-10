@@ -31,7 +31,12 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int worldWidth = tileSize * maxWorldCol;
 	public final int worldHeight = tileSize * maxWorldRow;
 	public int mapTileNum[][];
-	
+	public int[][] matrix = {
+		    {120, 120},
+		    {screenWidth - 160, 120},
+		    {120, screenHeight - 160},
+		    {screenWidth - 160, screenHeight - 160}
+		};
 	public Player myPlayer;
 	
 	// FPS
@@ -107,6 +112,7 @@ public class GamePanel extends JPanel implements Runnable{
 		    p.draw(g2);
 		}
 		myPlayer.draw(g2);
+		myPlayer.drawHearts(g2);
 		//player.draw(g2);
 		
 		g2.dispose(); // parang na frefree up lang yung ginamit natin pang drawing

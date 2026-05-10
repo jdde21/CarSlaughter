@@ -37,24 +37,31 @@ public class GameServer {
             client.clientID = playerCounter;
             clients.add(client);
             client.start();
-            GameServer.broadcast("NEW_PLAYER", client);
-            sendTo(client, "NEW_PLAYER", playerCounter++);
+
+            GameServer.broadcast("NEW_PLAYER", client); // to update old players of a new player
+            sendTo(client, "NEW_PLAYER", playerCounter++); // to know how many old players there are
             sendID(client);
             counter++;
         }
     }
 
     public static void broadcast(String message, ClientHandler sender) {
+    	String temp = message;
+    	if (message.equals("NEW_PLAYER"))
+    	{
+    		temp = message + "," + playerCounter;
+    	}
         for (ClientHandler client : clients) {
             if (client != sender) {
-                client.sendMessage(message);
+                client.sendMessage(temp);
             }
         }
     }
     
     public static void sendTo(ClientHandler client, String message, int times) {
         for (int i = 0; i < times; i++) {
-            client.sendMessage(message);
+        	String temp = message + "," + i;
+            client.sendMessage(temp);
         }
     }
     

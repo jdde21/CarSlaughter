@@ -45,8 +45,9 @@ public class GameClient {
                 	System.out.println("checkthis: " + msg);
                 	if (parts.length > 1)
                 	{
-                		
-                		if (parts[0].equals("id"))
+                		// this is where the newly connected player will go to add some more details to its sprite including
+                		// the starting position and the color of the car
+                		if (parts[0].equals("id")) 
                 		{
                 			 matrix = new int[][] { 
                 	    		    {120, 120},
@@ -62,6 +63,7 @@ public class GameClient {
                 			}
                 			player.worldX = matrix[gamePanel.myPlayer.playerID][0];
                 			player.worldY = matrix[gamePanel.myPlayer.playerID][1];
+                			player.getPlayerImage();
                 			new Main(gamePanel, "Player " + player.playerID);
                 		}
                 		
@@ -152,7 +154,8 @@ public class GameClient {
                 		
                     	
                 	}
-                	
+                	// this is where the newly connected player will go to spawn the older players
+                	// this is also where the older players will go to spawn the new player
                 	else
                 	{
                 		System.out.println("Other player: " + msg);
@@ -166,14 +169,15 @@ public class GameClient {
         	    		    {gamePanel.screenWidth - 160, gamePanel.screenHeight - 160}
         	    		};
         	    		
-                        // Hardcoded spawn positions
+                      
                         int x = temp[counter][0];
                         int y = temp[counter][1];
                
                         
-                        
-                        // IMPORTANT: no KeyHandler for other players
+                       
                         Player newPlayer = new Player(gamePanel, null, x, y);
+                        newPlayer.playerID = counter;
+                        newPlayer.getPlayerImage();
                     	if (counter % 2 != 0)
             			{
             				newPlayer.direction = "left";

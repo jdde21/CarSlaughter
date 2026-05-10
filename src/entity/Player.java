@@ -19,7 +19,7 @@ public class Player extends Entity {
 	KeyHandler keyH;
 	int bulletCounter = 0;
 	ArrayList<int[]> barriers = new ArrayList<>();
-	public int playerID;
+	public int playerID = 0;
 	
 	int test = 0;
 	
@@ -28,7 +28,9 @@ public class Player extends Entity {
 	
 	boolean hit = false;
 	int hitCounter = 0;
+	int shieldCounter = 0;
 	int lives = 3;
+
 	boolean decreaseLife = true;
 	boolean invisible = false;
 	boolean playerMove = false;
@@ -38,6 +40,7 @@ public class Player extends Entity {
 	public boolean left = false;
 	public boolean space = false;
 	public PrintWriter out;
+	public int playerSize = 40;
 	
 	public Player(GamePanel gp, KeyHandler keyH, int worldX, int worldY) {
 		this.gp = gp;
@@ -87,23 +90,47 @@ public class Player extends Entity {
 	
 	public void getPlayerImage() {
 		try {
+		
+		String path;
+		if (playerID == 0)
+		{
+			path = "/player_green/green_";
+		}
+		else if (playerID == 1)
+		{
+			path = "/player_black/black_";
+		}
+		else if (playerID == 2)
+		{
+			path = "/player_red/red_";
+		}
+		else
+		{
+			path = "/player_yellow/yellow_";
+		}
 			
-		up1 = ImageIO.read(getClass().getResourceAsStream("/player/green_car_n.png"));
-		up2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_2.png"));
-		down1 = ImageIO.read(getClass().getResourceAsStream("/player/green_car_s.png"));
-		down2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_2.png"));
-		left1 = ImageIO.read(getClass().getResourceAsStream("/player/green_car_e.png"));
-		left2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_2.png"));
-		right1 = ImageIO.read(getClass().getResourceAsStream("/player/green_car_w.png"));
-		right2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_2.png"));
+		up1 = ImageIO.read(getClass().getResourceAsStream(path + "car_n.png"));
+		down1 = ImageIO.read(getClass().getResourceAsStream(path + "car_s.png"));
+		left1 = ImageIO.read(getClass().getResourceAsStream(path + "car_w.png"));
+		right1 = ImageIO.read(getClass().getResourceAsStream(path + "car_e.png"));
+		
+//		up2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_2.png"));
+//		down2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_2.png"));
+//		left2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_2.png"));
+//		right2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_2.png"));
 			
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	// this will update the player's position in terms of the world map, not the window/screen map
+	// called by other client or other gamepanels
+	// still controlling the same player as update()
 	public void updateFromOther() {
+		if (lives <= 0) {
+			return;
+		}
+		
 		if (up) {
 			direction = "up";
 			playerMove = true;
@@ -163,8 +190,10 @@ public class Player extends Entity {
 //		}
 	}
 	
+	// called by own client or own gamepanel
+	// still controlling the same player as updateFromOther()
 	public void update() {
-		if (lives == 0) {
+		if (lives <= 0) {
 			return;
 		}
 		
@@ -309,6 +338,7 @@ public class Player extends Entity {
 		{
 			if (decreaseLife)
 			{
+				System.out.println("dead");
 				lives -= 1;
 				decreaseLife = false;
 			}
@@ -319,18 +349,70 @@ public class Player extends Entity {
 			
 			if (!invisible)
 			{
-				g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
+				g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
 			}
 			
 			hitCounter++;
 		}
+		else if (shield && shieldCounter < 500)
+		{
+			String path;
+			if (playerID == 0)
+			{
+				path = "/player_green/green_car";
+			}
+			else if (playerID == 1)
+			{
+				path = "/player_black/black_car";
+			}
+			else if (playerID == 2)
+			{
+				path = "/player_red/red_car";
+			}
+			else
+			{
+				path = "/player_yellow/yellow_car";
+			}
+			
+			
+			try {
+				BufferedImage temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_n.png"));
+				switch(direction)
+				{
+					case "up":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_n.png"));
+						break;
+					case "down":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_s.png"));
+						break;
+					case "left":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_w.png"));
+						break;
+					case "right":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_e.png"));
+					
+				}
+				g2.drawImage(temp, worldX, worldY, playerSize, playerSize, null);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		
+			shieldCounter++;
+		}
 		else 
 		{
+			// resets shield
+			shieldCounter = 0;
+			shield = false;
+			
+			// resets hit
 			hitCounter = 0;
 			hit = false;
 			decreaseLife = true;
-			// if car, 50 by 34 gamitin
-			g2.drawImage(image, worldX, worldY, 40, 40, null);
+
+			g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
 		}
 			
 	}

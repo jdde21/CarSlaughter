@@ -16,6 +16,8 @@ public class TileManager {
 	GamePanel gp;
 	public Tile[] tile;
 	public int mapTileNum[][];
+	public int powerTileNum[][];
+	public boolean drawShield = true;
 	boolean once = true;
 	
 	public TileManager(GamePanel gp) {
@@ -24,7 +26,9 @@ public class TileManager {
 		
 		tile = new Tile[90];
 		gp.mapTileNum = new int[gp.maxScreenRow][gp.maxScreenCol];
+		gp.powerTileNum = new int[gp.maxScreenRow][gp.maxScreenCol];
 		this.mapTileNum = gp.mapTileNum;
+		this.powerTileNum = gp.powerTileNum;
 		
 		getTileImage();
 		loadMap("/maps/final_map.txt");
@@ -44,26 +48,6 @@ public class TileManager {
 			    }
 			}
 			
-//			tile[0] = new Tile();
-//			tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass.png"));
-//			
-//			tile[1] = new Tile();
-//			tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/wall.png"));
-//			tile[1].collision = true;
-//			
-//			tile[2] = new Tile();
-//			tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/water.png"));
-//			tile[2].collision = true;
-//			
-//			tile[3] = new Tile();
-//			tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/earth.png"));
-//			
-//			tile[4] = new Tile();
-//			tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tree.png"));
-//			
-//			tile[5] = new Tile();
-//			tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/sand.png"));
-
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -92,33 +76,29 @@ public class TileManager {
 		}
 	}
 	
+	
 	public void draw(Graphics g2) {		
 		
-		// implementing camera
+
 		for (int i = 0; i < gp.maxScreenRow; i++) {
 			for (int j = 0; j < gp.maxScreenCol; j++) {
 				
 				int tileNum = mapTileNum[i][j];
-				
-				if (tileNum == 2 && once)
-				{
-					System.out.println("x: " + j * gp.tileSize + "y: " + i * gp.tileSize);
-				}
 				g2.drawImage(tile[tileNum].image, j * gp.tileSize, i * gp.tileSize, gp.tileSize, gp.tileSize, null);
-//				int worldX = j * gp.tileSize;
-//				int worldY = i * gp.tileSize;
-//				
-//				// need na muna natin yung difference in distance nung tile and nung player in the world map
-//				
-//				int screenX = (worldX - gp.player.worldX) + gp.player.screenX;
-//				int screenY = (worldY - gp.player.worldY) + gp.player.screenY;
-//				if (screenX >= -50 && screenX <= 768)
-//				{
-//					if (screenY >= -50 && screenY <= 576)
-//					{
-//						g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
-//					}
-//				}
+				
+				if ((i == gp.maxScreenRow/2 && j == gp.maxScreenCol/2) && drawShield)
+				{
+					try {
+						Tile temp = new Tile();
+						String fileName = "/powers/power_up_shield.png";
+						temp.image = ImageIO.read(getClass().getResourceAsStream(fileName));
+						temp.shield = true;
+						g2.drawImage(temp.image, j * gp.tileSize, i * gp.tileSize, gp.tileSize, gp.tileSize, null);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
 			}
 		}
 		once = false;

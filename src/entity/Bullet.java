@@ -99,6 +99,7 @@ public class Bullet extends Entity{
 	        	{
 	        		System.out.println("hit " + temp.playerID);
 	        		gp.myPlayer.bullets.remove(this);
+	        		shooter.bullets.remove(this);
 	        		if (!gp.myPlayer.shield) 
 	        		{
 	        			temp.hit = true;
@@ -126,6 +127,7 @@ public class Bullet extends Entity{
             	{
             		System.out.println("hit " + player.playerID);
             		gp.myPlayer.bullets.remove(this);
+            		shooter.bullets.remove(this);
             		if (!player.shield)
             		{
             			player.hit = true;

@@ -91,16 +91,23 @@ public class Bullet extends Entity{
 			int tempYPos = temp.worldY;
 			int tempBulletX = worldX + playerTileSize/2;
 			int tempBulletY = worldY + playerTileSize/2;
-			System.out.println(this.worldX + " " + this.worldY + " " + tempYPos);
+			
+		
 			if (tempBulletX >= tempXPos && tempBulletX <= tempXPos + playerTileSize)
 			{
 				if (tempBulletY >= tempYPos && tempBulletY <= tempYPos + playerTileSize)
 	        	{
 	        		System.out.println("hit " + temp.playerID);
 	        		gp.myPlayer.bullets.remove(this);
-	        		temp.hit = true;
+	        		shooter.bullets.remove(this);
+	        		if (!gp.myPlayer.shield) 
+	        		{
+	        			temp.hit = true;
+	        		}
 	        	}
 			}
+			
+			
 		}
 		
 		for (Player player : gp.players) {
@@ -112,16 +119,23 @@ public class Bullet extends Entity{
 			int yPos = player.worldY;
 			int bulletX = worldX + playerTileSize/2;
 			int bulletY = worldY + playerTileSize/2;
-			System.out.println(this.worldX + " " + this.worldY + " " + yPos);
+			
+		
 			if (bulletX >= xPos && bulletX <= xPos + playerTileSize)
 			{
 				if (bulletY >= yPos && bulletY <= yPos + playerTileSize)
             	{
             		System.out.println("hit " + player.playerID);
             		gp.myPlayer.bullets.remove(this);
-            		player.hit = true;
+            		shooter.bullets.remove(this);
+            		if (!player.shield)
+            		{
+            			player.hit = true;
+            		}
             	}
 			}
+			
+			
         }
 	}
 	

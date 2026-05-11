@@ -12,7 +12,9 @@ public class GameClient {
     private static final String CHAT_PREFIX = "CHAT ";
     public static ArrayList<Player> players = new ArrayList<>();
     static int[] positions = {0, 50, 25, 30};
-
+    
+	public static int[][] matrix;
+	
     public static void main(String[] args) throws IOException {
 
         Socket socket = new Socket(SERVER_IP, SERVER_PORT);

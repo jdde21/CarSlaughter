@@ -19,16 +19,19 @@ public class Player extends Entity {
 	KeyHandler keyH;
 	int bulletCounter = 0;
 	ArrayList<int[]> barriers = new ArrayList<>();
-	public int playerID;
+	public int playerID = 0;
 	
 	int test = 0;
 	
 	ArrayList<Bullet> bullets = new ArrayList<>();
 	boolean switcher = false;
 	
-	
 	boolean hit = false;
 	int hitCounter = 0;
+	int shieldCounter = 0;
+	int lives = 3;
+
+	boolean decreaseLife = true;
 	boolean invisible = false;
 	boolean playerMove = false;
 	public boolean up = false;
@@ -37,12 +40,16 @@ public class Player extends Entity {
 	public boolean left = false;
 	public boolean space = false;
 	public PrintWriter out;
+	public int playerSize = 40;
 	
 	public Player(GamePanel gp, KeyHandler keyH, int worldX, int worldY) {
 		this.gp = gp;
 		this.keyH = keyH;
-		this.worldX = 120;
-		this.worldY = 120;
+		
+			
+		this.worldX = worldX;
+		this.worldY = worldY;
+	
 		
 		// sinubtract by gp.tileSize/2 dahil if wala yan, hindi centered yung mismong character pero yung top left nung hitbox nung character
 		
@@ -57,32 +64,73 @@ public class Player extends Entity {
 		barriers();
 	}
 	
+	public void drawHearts(Graphics g2) {
+		int x = gp.screenWidth/2;
+		int y = gp.screenHeight/20;
+		
+		try {
+			BufferedImage temp = ImageIO.read(getClass().getResourceAsStream("/misce/heart.png"));
+			int spacing = gp.tileSize + 5; 
+			for (int i = 0; i < lives; i++) {
+			    int horizontalPos = (x + (i * spacing)) - 40;
+			    g2.drawImage(temp, horizontalPos, y, gp.tileSize, gp.tileSize, null);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
 	public void setDefaultValues() {
-//		worldX = 0;
-//		worldY = 0;
 		speed = 4;
 		direction = "right";
 	}
 	
 	public void getPlayerImage() {
 		try {
+		
+		String path;
+		if (playerID == 0)
+		{
+			path = "/player_green/green_";
+		}
+		else if (playerID == 1)
+		{
+			path = "/player_black/black_";
+		}
+		else if (playerID == 2)
+		{
+			path = "/player_red/red_";
+		}
+		else
+		{
+			path = "/player_yellow/yellow_";
+		}
 			
-		up1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_1.png"));
-		up2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_2.png"));
-		down1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_1.png"));
-		down2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_2.png"));
-		left1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_1.png"));
-		left2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_2.png"));
-		right1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_1.png"));
-		right2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_2.png"));
+		up1 = ImageIO.read(getClass().getResourceAsStream(path + "car_n.png"));
+		down1 = ImageIO.read(getClass().getResourceAsStream(path + "car_s.png"));
+		left1 = ImageIO.read(getClass().getResourceAsStream(path + "car_w.png"));
+		right1 = ImageIO.read(getClass().getResourceAsStream(path + "car_e.png"));
+		
+//		up2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_2.png"));
+//		down2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_2.png"));
+//		left2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_2.png"));
+//		right2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_2.png"));
 			
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	// this will update the player's position in terms of the world map, not the window/screen map
+	// called by other client or other gamepanels
+	// still controlling the same player as update()
 	public void updateFromOther() {
+		if (lives <= 0) {
+			return;
+		}
+		
 		if (up) {
 			direction = "up";
 			playerMove = true;
@@ -107,8 +155,6 @@ public class Player extends Entity {
 			bulletCounter++;
 		}
 		
-		System.out.println("look here " + direction);
-		System.out.println(up + " " + down + " " + right + " " + left);
 		
 		collisionOn = false;
 		gp.checker.checkTile(this);
@@ -135,16 +181,22 @@ public class Player extends Entity {
 		playerMove = false;
 		
 		
-		if (up || down || right || left) {
-			spriteCounter++;
-			if (spriteCounter > 20) {
-				spriteNum = (spriteNum + 1) % 2;
-				spriteCounter = 0;
-			}
-		}
+//		if (up || down || right || left) {
+//			spriteCounter++;
+//			if (spriteCounter > 20) {
+//				spriteNum = (spriteNum + 1) % 2;
+//				spriteCounter = 0;
+//			}
+//		}
 	}
 	
+	// called by own client or own gamepanel
+	// still controlling the same player as updateFromOther()
 	public void update() {
+		if (lives <= 0) {
+			return;
+		}
+		
 		if (keyH.upPressed) {
 			out.println("up" + " " + playerID);
 			direction = "up";
@@ -204,54 +256,14 @@ public class Player extends Entity {
 		
 		playerMove = false;
 		
-//		int barrier_length = barriers.size();
-//		for (int i = 0; i < barrier_length; i++) 
-//		{
-//		    int[] barrier = barriers.get(i);
-//
-//		    int x = barrier[0] * gp.tileSize;
-//		    int y = barrier[1] * gp.tileSize;
-//
-//		    int xPos = worldX + gp.tileSize;
-//			int yPos = worldY + playerTileSize;
-//			boolean inside = false;
-//			if (xPos >= x && xPos <= x + gp.tileSize)
-//			{
-//				if (yPos >= y && yPos <= y + gp.tileSize)
-//				{
-//					inside = true;
-//					if (direction == "right")
-//					{
-//						worldX -= speed;
-//					}
-//					else if (direction == "left")
-//					{
-//						worldX += speed;
-//					}
-//					else if (direction == "up")
-//					{
-//						worldY += speed;
-//					}
-//					else
-//					{
-//						worldY -= speed;
-//					}
-//				}
-//			}
-//			
-//			if (inside)
-//			{
-//				break;
+		
+//		if (keyH.upPressed || keyH.downPressed || keyH.rightPressed || keyH.leftPressed) {
+//			spriteCounter++;
+//			if (spriteCounter > 20) {
+//				spriteNum = (spriteNum + 1) % 2;
+//				spriteCounter = 0;
 //			}
 //		}
-		
-		if (keyH.upPressed || keyH.downPressed || keyH.rightPressed || keyH.leftPressed) {
-			spriteCounter++;
-			if (spriteCounter > 20) {
-				spriteNum = (spriteNum + 1) % 2;
-				spriteCounter = 0;
-			}
-		}
 		
 	}
 	
@@ -324,6 +336,12 @@ public class Player extends Entity {
 		}
 		if (hit && hitCounter < 500)
 		{
+			if (decreaseLife)
+			{
+				System.out.println("dead");
+				lives -= 1;
+				decreaseLife = false;
+			}
 			if (hitCounter % 20 == 0)
 			{
 				invisible = !invisible;
@@ -331,19 +349,72 @@ public class Player extends Entity {
 			
 			if (!invisible)
 			{
-				g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
+				g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
 			}
+			
 			hitCounter++;
+		}
+		else if (shield && shieldCounter < 500)
+		{
+			String path;
+			if (playerID == 0)
+			{
+				path = "/player_green/green_car";
+			}
+			else if (playerID == 1)
+			{
+				path = "/player_black/black_car";
+			}
+			else if (playerID == 2)
+			{
+				path = "/player_red/red_car";
+			}
+			else
+			{
+				path = "/player_yellow/yellow_car";
+			}
+			
+			
+			try {
+				BufferedImage temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_n.png"));
+				switch(direction)
+				{
+					case "up":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_n.png"));
+						break;
+					case "down":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_s.png"));
+						break;
+					case "left":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_w.png"));
+						break;
+					case "right":
+						temp = ImageIO.read(getClass().getResourceAsStream(path + "_shielded_e.png"));
+					
+				}
+				g2.drawImage(temp, worldX, worldY, playerSize, playerSize, null);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		
+			shieldCounter++;
 		}
 		else 
 		{
+			// resets shield
+			shieldCounter = 0;
+			shield = false;
+			
+			// resets hit
 			hitCounter = 0;
 			hit = false;
-			// if car, 50 by 34 gamitin
-			g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
-		}
-		
+			decreaseLife = true;
 
+			g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
+		}
+			
 	}
 }
 

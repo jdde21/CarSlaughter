@@ -31,8 +31,15 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int worldWidth = tileSize * maxWorldCol;
 	public final int worldHeight = tileSize * maxWorldRow;
 	public int mapTileNum[][];
-	
+	public int powerTileNum[][];
+	public int[][] matrix = {
+		    {120, 120},
+		    {screenWidth - 160, 120},
+		    {120, screenHeight - 160},
+		    {screenWidth - 160, screenHeight - 160}
+		};
 	public Player myPlayer;
+	public int shieldTimer = 0;
 	
 	// FPS
 	int FPS = 60;
@@ -89,12 +96,9 @@ public class GamePanel extends JPanel implements Runnable{
 	}
 	
 	public void update() {
-//		for (Player p : players) {
-//		    p.update();
-//		}
 		myPlayer.update();
 	}
-
+	
 	
 	public void paintComponent(Graphics g) {
 	
@@ -105,8 +109,25 @@ public class GamePanel extends JPanel implements Runnable{
 		tileManager.draw(g2);
 		for (Player p : players) {
 		    p.draw(g2);
+		    if (p.shield) {
+		    	tileManager.drawShield = false;
+		    }
+		}
+		
+		if (myPlayer.shield) {
+			tileManager.drawShield = false;
+		}
+		
+		if (!tileManager.drawShield) {
+			shieldTimer++;
+		}
+		
+		if (shieldTimer == 700) {
+			shieldTimer = 0;
+			tileManager.drawShield = true;
 		}
 		myPlayer.draw(g2);
+		myPlayer.drawHearts(g2);
 		//player.draw(g2);
 		
 		g2.dispose(); // parang na frefree up lang yung ginamit natin pang drawing

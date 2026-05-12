@@ -17,14 +17,15 @@ public class Bullet extends Entity{
 	int test = 0;
 	boolean switcher = false;
 	BufferedImage image = right1;
-	int playerTileSize = 32;
+	int BulletSize = 32;
 	
 	
-	public Bullet(GamePanel gp, int worldX, int worldY, String direction) {
+	public Bullet(GamePanel gp, int worldX, int worldY, String direction, int bulletSize) {
 		this.gp = gp;
 		this.worldX = worldX;
 		this.worldY = worldY;
 		this.direction = direction;
+		this.BulletSize = bulletSize;
 		
 		getPlayerImage();
 		setDefaultValues();
@@ -89,13 +90,13 @@ public class Bullet extends Entity{
 			Player temp = gp.myPlayer;
 			int tempXPos = temp.worldX;
 			int tempYPos = temp.worldY;
-			int tempBulletX = worldX + playerTileSize/2;
-			int tempBulletY = worldY + playerTileSize/2;
+			int tempBulletX = worldX + BulletSize/2;
+			int tempBulletY = worldY + BulletSize/2;
 			
 		
-			if (tempBulletX >= tempXPos && tempBulletX <= tempXPos + playerTileSize)
+			if (tempBulletX >= tempXPos && tempBulletX <= tempXPos + BulletSize)
 			{
-				if (tempBulletY >= tempYPos && tempBulletY <= tempYPos + playerTileSize)
+				if (tempBulletY >= tempYPos && tempBulletY <= tempYPos + BulletSize)
 	        	{
 	        		System.out.println("hit " + temp.playerID);
 	        		gp.myPlayer.bullets.remove(this);
@@ -117,13 +118,13 @@ public class Bullet extends Entity{
 			}
 			int xPos = player.worldX;
 			int yPos = player.worldY;
-			int bulletX = worldX + playerTileSize/2;
-			int bulletY = worldY + playerTileSize/2;
+			int bulletX = worldX + BulletSize/2;
+			int bulletY = worldY + BulletSize/2;
 			
 		
-			if (bulletX >= xPos && bulletX <= xPos + playerTileSize)
+			if (bulletX >= xPos && bulletX <= xPos + BulletSize)
 			{
-				if (bulletY >= yPos && bulletY <= yPos + playerTileSize)
+				if (bulletY >= yPos && bulletY <= yPos + BulletSize)
             	{
             		System.out.println("hit " + player.playerID);
             		gp.myPlayer.bullets.remove(this);
@@ -140,8 +141,7 @@ public class Bullet extends Entity{
 	}
 	
 	public void draw(Graphics g2) {
-		
-		g2.drawImage(image, worldX, worldY, playerTileSize, playerTileSize, null);
+		g2.drawImage(image, worldX, worldY, BulletSize, BulletSize, null);
 	}
 		
 	

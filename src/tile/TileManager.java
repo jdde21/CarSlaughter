@@ -17,7 +17,8 @@ public class TileManager {
 	public Tile[] tile;
 	public int mapTileNum[][];
 	public int powerTileNum[][];
-	public boolean drawShield = true;
+	public boolean drawPowerUp = true;
+	public int randomPowerUp;
 	boolean once = true;
 	
 	public TileManager(GamePanel gp) {
@@ -86,11 +87,20 @@ public class TileManager {
 				int tileNum = mapTileNum[i][j];
 				g2.drawImage(tile[tileNum].image, j * gp.tileSize, i * gp.tileSize, gp.tileSize, gp.tileSize, null);
 				
-				if ((i == gp.maxScreenRow/2 && j == gp.maxScreenCol/2) && drawShield)
+				if ((i == gp.maxScreenRow/2 && j == gp.maxScreenCol/2) && drawPowerUp)
 				{
 					try {
 						Tile temp = new Tile();
-						String fileName = "/powers/power_up_shield.png";
+						String fileName;
+						if (randomPowerUp == 0)
+						{
+							fileName = "/powers/power_up_shield.png";
+						}
+						else
+						{
+							fileName = "/powers/power_up_arrow.png";
+						}
+						
 						temp.image = ImageIO.read(getClass().getResourceAsStream(fileName));
 						temp.shield = true;
 						g2.drawImage(temp.image, j * gp.tileSize, i * gp.tileSize, gp.tileSize, gp.tileSize, null);

@@ -29,6 +29,9 @@ public class Player extends Entity {
 	boolean hit = false;
 	int hitCounter = 0;
 	int shieldCounter = 0;
+	int damageCounter = 0;
+	int bulletSize = 32;
+	
 	int lives = 3;
 
 	boolean decreaseLife = true;
@@ -41,6 +44,7 @@ public class Player extends Entity {
 	public boolean space = false;
 	public PrintWriter out;
 	public int playerSize = 40;
+	
 	
 	public Player(GamePanel gp, KeyHandler keyH, int worldX, int worldY) {
 		this.gp = gp;
@@ -150,14 +154,14 @@ public class Player extends Entity {
 		if (space) {
 			if (bulletCounter % 5 == 0)
 			{
-				bullets.add(new Bullet(this.gp, worldX, worldY, direction));
+				bullets.add(new Bullet(this.gp, worldX, worldY, direction, bulletSize));
 			}
 			bulletCounter++;
 		}
 		
 		
 		collisionOn = false;
-		gp.checker.checkTile(this);
+		gp.checker.checkTile(this, gp.tileManager.randomPowerUp);
 		
 		if (!collisionOn && playerMove)
 		{
@@ -226,14 +230,14 @@ public class Player extends Entity {
 			out.println("space" + " " + playerID);
 			if (bulletCounter % 5 == 0)
 			{
-				bullets.add(new Bullet(this.gp, worldX, worldY, direction));
+				bullets.add(new Bullet(this.gp, worldX, worldY, direction, bulletSize));
 			}
 			bulletCounter++;
 		}
 		
 		
 		collisionOn = false;
-		gp.checker.checkTile(this);
+		gp.checker.checkTile(this, gp.tileManager.randomPowerUp);
 		
 		if (!collisionOn && playerMove)
 		{
@@ -401,16 +405,29 @@ public class Player extends Entity {
 		
 			shieldCounter++;
 		}
+		else if (damage && damageCounter < 500)
+		{
+			bulletSize = 48;
+			damageCounter++;
+			
+			g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
+		}
 		else 
 		{
-			// resets shield
+			// resets shield power up
 			shieldCounter = 0;
 			shield = false;
+			
+			// resets damage power up
+			damageCounter = 0;
+			bulletSize = 32;
+			damage = false;
 			
 			// resets hit
 			hitCounter = 0;
 			hit = false;
 			decreaseLife = true;
+			
 
 			g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
 		}

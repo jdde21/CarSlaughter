@@ -23,7 +23,20 @@ public class CollisionChecker {
 		return false;
 	}
 	
-	public void checkTile(Entity entity)
+	public void powerUpEnabled(Entity entity, int powerUp)
+	{
+		if (powerUp == 0)
+		{
+			entity.shield = true;
+		}
+		
+		if (powerUp == 1)
+		{
+			entity.damage = true;
+		}
+	}
+	
+	public void checkTile(Entity entity, int powerUp)
 	{
 		int playerTile = gp.tileSize;
 		int entityLeftWorldX = entity.worldX + entity.solidArea.x;
@@ -47,7 +60,7 @@ public class CollisionChecker {
 				
 				if (checkMiddle(entityTopRow, entityLeftCol) || checkMiddle(entityTopRow, entityRightCol))
 				{
-					entity.shield = true;
+					powerUpEnabled(entity, powerUp);
 				}
 				
 				if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision)
@@ -63,7 +76,7 @@ public class CollisionChecker {
 				
 				if (checkMiddle(entityBottomRow, entityLeftCol) || checkMiddle(entityBottomRow, entityRightCol))
 				{
-					entity.shield = true;
+					powerUpEnabled(entity, powerUp);
 				}
 				
 				if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision)
@@ -78,7 +91,7 @@ public class CollisionChecker {
 				
 				if (checkMiddle(entityTopRow, entityLeftCol) || checkMiddle(entityBottomRow, entityLeftCol))
 				{
-					entity.shield = true;
+					powerUpEnabled(entity, powerUp);
 				}
 				
 				if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision)
@@ -93,7 +106,7 @@ public class CollisionChecker {
 				
 				if (checkMiddle(entityTopRow, entityRightCol) || checkMiddle(entityBottomRow, entityRightCol))
 				{
-					entity.shield = true;
+					powerUpEnabled(entity, powerUp);
 				}
 				
 				if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision)

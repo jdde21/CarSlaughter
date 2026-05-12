@@ -2,6 +2,9 @@ package main;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Random;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -39,7 +42,12 @@ public class GamePanel extends JPanel implements Runnable{
 		    {screenWidth - 160, screenHeight - 160}
 		};
 	public Player myPlayer;
-	public int shieldTimer = 0;
+	public Dictionary<String, Integer> powerUps = new Hashtable<>();
+
+    
+	public int powerUpTimer = 0;
+	public int numberOfPowerUps = 2;
+	Random r= new Random();
 	
 	// FPS
 	int FPS = 60;
@@ -49,13 +57,16 @@ public class GamePanel extends JPanel implements Runnable{
 	//public Player player = new Player(this, keyH);
 	public ArrayList<Player> players;
 	
-	TileManager tileManager = new TileManager(this);
+	public TileManager tileManager = new TileManager(this);
 		
 	public GamePanel(ArrayList<Player> players, KeyHandler keyH) {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
 		this.setBackground(Color.black);
 		this.setDoubleBuffered(true);
 		this.players = players;
+		powerUps.put("shield", 0);
+		powerUps.put("damage", 1);
+		tileManager.randomPowerUp = 0;
 		
 		this.addKeyListener(keyH); // will send keyboard input events to keyH
 		this.setFocusable(true); // will allow this gamePanel object to receive keyboard inputs
@@ -109,22 +120,23 @@ public class GamePanel extends JPanel implements Runnable{
 		tileManager.draw(g2);
 		for (Player p : players) {
 		    p.draw(g2);
-		    if (p.shield) {
-		    	tileManager.drawShield = false;
+		    if (p.shield || p.damage) {
+		    	tileManager.drawPowerUp = false;
 		    }
 		}
 		
-		if (myPlayer.shield) {
-			tileManager.drawShield = false;
+		if (myPlayer.shield || myPlayer.damage) {
+			tileManager.drawPowerUp = false;
 		}
 		
-		if (!tileManager.drawShield) {
-			shieldTimer++;
+		if (!tileManager.drawPowerUp) {
+			powerUpTimer++;
 		}
 		
-		if (shieldTimer == 700) {
-			shieldTimer = 0;
-			tileManager.drawShield = true;
+		if (powerUpTimer == 700) {
+			tileManager.randomPowerUp = (tileManager.randomPowerUp + 1) % numberOfPowerUps;
+			powerUpTimer = 0;
+			tileManager.drawPowerUp = true;
 		}
 		myPlayer.draw(g2);
 		myPlayer.drawHearts(g2);

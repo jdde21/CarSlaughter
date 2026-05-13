@@ -10,6 +10,7 @@ public class GameClient {
 
     private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 12345;
+    private static final String CHAT_PREFIX = "CHAT ";
     public static ArrayList<Player> players = new ArrayList<>();
     static int[] positions = {0, 50, 25, 30};
     
@@ -33,16 +34,22 @@ public class GameClient {
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
         player.out = out;
         
-    
+        ChatWindow chatWindow = new ChatWindow(out);
+        keyH.setShowChatAction(chatWindow::showAndFocus);
+        chatWindow.showAndFocus();
 
         // Thread to listen for server messages
         new Thread(() -> { 
             try {
                 String msg;
                 while ((msg = in.readLine()) != null) {
+                	if (msg.startsWith(CHAT_PREFIX)) {
+                        handleChatMessage(msg, chatWindow);
+                        return;
+                    }
+                	
                 	String[] parts = msg.split(" ");
-                	System.out.println(parts);
-                	System.out.println("checkthis: " + msg);
+                	
                 	if (parts.length > 1)
                 	{
                 		// this is where the newly connected player will go to add some more details to its sprite including
@@ -55,12 +62,13 @@ public class GameClient {
                 	    		    {120, gamePanel.screenHeight - 160},
                 	    		    {gamePanel.screenWidth - 160, gamePanel.screenHeight - 160}
                 	    		};
-                	    		
+                	    	
                 			gamePanel.myPlayer.playerID = Integer.parseInt(parts[1]);
                 			if (gamePanel.myPlayer.playerID % 2 != 0)
                 			{
                 				player.direction = "left";
                 			}
+                			chatWindow.setPlayerID(gamePanel.myPlayer.playerID);
                 			player.worldX = matrix[gamePanel.myPlayer.playerID][0];
                 			player.worldY = matrix[gamePanel.myPlayer.playerID][1];
                 			player.getPlayerImage();
@@ -197,5 +205,12 @@ public class GameClient {
             String input = scanner.nextLine();
             out.println(input);
         } 
+    }
+    
+    private static void handleChatMessage(String msg, ChatWindow chatWindow) {
+        String[] parts = msg.split(" ", 3);
+        if (parts.length == 3) {
+            chatWindow.appendChatMessage("Player " + parts[1] + ": " + parts[2]);
+        }
     }
 }

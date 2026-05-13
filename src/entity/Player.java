@@ -3,6 +3,7 @@ package entity;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.Timer;
 
 import main.*;
 
@@ -33,6 +35,8 @@ public class Player extends Entity {
 	int bulletSize = 32;
 	
 	int lives = 3;
+	
+	int deathCounter = 0;
 
 	boolean decreaseLife = true;
 	boolean invisible = false;
@@ -44,7 +48,7 @@ public class Player extends Entity {
 	public boolean space = false;
 	public PrintWriter out;
 	public int playerSize = 40;
-	
+	BufferedImage[] frames = new BufferedImage[6];
 	
 	public Player(GamePanel gp, KeyHandler keyH, int worldX, int worldY) {
 		this.gp = gp;
@@ -117,6 +121,50 @@ public class Player extends Entity {
 		down1 = ImageIO.read(getClass().getResourceAsStream(path + "car_s.png"));
 		left1 = ImageIO.read(getClass().getResourceAsStream(path + "car_w.png"));
 		right1 = ImageIO.read(getClass().getResourceAsStream(path + "car_e.png"));
+		deadUp = ImageIO.read(getClass().getResourceAsStream("/player_dead/broken_car_n.png"));
+		deadDown = ImageIO.read(getClass().getResourceAsStream("/player_dead/broken_car_s.png"));
+		deadRight = ImageIO.read(getClass().getResourceAsStream("/player_dead/broken_car_e.png"));
+		deadLeft = ImageIO.read(getClass().getResourceAsStream("/player_dead/broken_car_w.png"));
+		
+		BufferedImage sheet = ImageIO.read(
+			    getClass().getResourceAsStream("/misce/explosion.jpg")
+			);
+
+		int frameWidth = 1930;
+		int frameHeight = 2250;
+
+		int index = 0;
+		
+		for (int row = 0; row < 2; row++) {
+		    for (int col = 0; col < 3; col++) {
+
+		        BufferedImage frame = sheet.getSubimage(
+		            col * frameWidth,
+		            row * frameHeight,
+		            frameWidth,
+		            frameHeight
+		        );
+
+		        // Scale to 40x40
+		        Image scaled = frame.getScaledInstance(
+		            40,
+		            40,
+		            Image.SCALE_SMOOTH
+		        );
+
+		        BufferedImage scaledBuffered = new BufferedImage(
+		            40,
+		            40,
+		            BufferedImage.TYPE_INT_ARGB
+		        );
+
+		        Graphics2D temp = scaledBuffered.createGraphics();
+		        temp.drawImage(scaled, 0, 0, null);
+		        temp.dispose();
+
+		        frames[index++] = scaledBuffered;
+		    }
+		}
 		
 //		up2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_2.png"));
 //		down2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_2.png"));
@@ -293,36 +341,56 @@ public class Player extends Entity {
 		//g2.fillRect(x, y, gp.tileSize, gp.tileSize);
 		BufferedImage image = null;
 		
-		switch(direction) {
-		case "up":
-			if (spriteNum == 1) {
-				image = up1;
-			} else {
-				image = up2;
-			}
-			
-			break;
-		case "down":
-			if (spriteNum == 1) {
-				image = down1;
-			} else {
-				image = down2;
-			}
-			break;
-		case "left":
-			if (spriteNum == 1) {
-				image = left1;
-			} else {
-				image = left2;
-			}
-			break;
-		case "right":
-			if (spriteNum == 1) {
-				image = right1;
-			} else {
-				image = right2;
+		if (lives > 0)
+		{
+			switch(direction) {
+			case "up":
+				if (spriteNum == 1) {
+					image = up1;
+				} else {
+					image = up2;
+				}
+				
+				break;
+			case "down":
+				if (spriteNum == 1) {
+					image = down1;
+				} else {
+					image = down2;
+				}
+				break;
+			case "left":
+				if (spriteNum == 1) {
+					image = left1;
+				} else {
+					image = left2;
+				}
+				break;
+			case "right":
+				if (spriteNum == 1) {
+					image = right1;
+				} else {
+					image = right2;
+				}
 			}
 		}
+		else
+		{
+			switch(direction) {
+			case "up":
+				image = deadUp;
+				break;
+			case "down":
+				image = deadDown;
+				break;
+			case "left":
+				image = deadLeft;
+				break;
+			case "right":
+				image = deadRight;
+			}
+		}
+		
 
 		Graphics2D g3 = (Graphics2D) g2;
 		for (int i = 0; i < bullets.size(); i++)
@@ -346,9 +414,13 @@ public class Player extends Entity {
 				lives -= 1;
 				decreaseLife = false;
 			}
-			if (hitCounter % 20 == 0)
+			if (hitCounter % 20 == 0 && lives > 0)
 			{
 				invisible = !invisible;
+			}
+			if (lives <= 0)
+			{
+				g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
 			}
 			
 			if (!invisible)
@@ -428,7 +500,6 @@ public class Player extends Entity {
 			hit = false;
 			decreaseLife = true;
 			
-
 			g2.drawImage(image, worldX, worldY, playerSize, playerSize, null);
 		}
 			

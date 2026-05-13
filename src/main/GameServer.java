@@ -8,6 +8,7 @@ import entity.Player;
 public class GameServer {
 
     private static final int PORT = 12345;
+    private static final String CHAT_PREFIX = "CHAT ";
     private static Set<ClientHandler> clients = new HashSet<>();
     public static ArrayList<Player> players = new ArrayList<>();
     public static int mainPlayerCount = 0;
@@ -102,7 +103,14 @@ public class GameServer {
                 String message;
                 while ((message = in.readLine()) != null) {
                     System.out.println("Received: " + message);
-                    GameServer.broadcast(message, this);
+                    if (message.startsWith(CHAT_PREFIX)) {
+                        String chatMessage = message.substring(CHAT_PREFIX.length()).trim().replaceAll("\\s+", " ");
+                        if (!chatMessage.isEmpty()) {
+                            GameServer.broadcast(CHAT_PREFIX + clientID + " " + chatMessage, this);
+                        }
+                    } else {
+                        GameServer.broadcast(message, this);
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("Player disconnected");

@@ -8,7 +8,7 @@ import entity.Player;
 
 public class GameClient {
 
-    private static final String SERVER_IP = "localhost";
+    // private static final String SERVER_IP = "localhost"; // this will be changed depending on the ip address of the server
     private static final int SERVER_PORT = 12345;
     private static final String CHAT_PREFIX = "CHAT ";
     public static ArrayList<Player> players = new ArrayList<>();
@@ -17,8 +17,13 @@ public class GameClient {
 	public static int[][] matrix;
 	
     public static void main(String[] args) throws IOException {
+    	
+    	Scanner inputScanner = new Scanner(System.in);
 
-        Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+        System.out.print("Enter server IP address: ");
+        String serverIP = inputScanner.nextLine();
+
+        Socket socket = new Socket(serverIP, SERVER_PORT);
         System.out.println("Connected to server!");
         
         KeyHandler keyH = new KeyHandler();
@@ -27,8 +32,6 @@ public class GameClient {
         gamePanel.myPlayer = player;        
        
         
-        
-
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
